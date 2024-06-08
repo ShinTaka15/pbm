@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:jember_wisataku/View/publik_guest/acara_tahunan.dart';
 import 'package:jember_wisataku/View/publik_guest/homepage.dart';
 import 'package:jember_wisataku/View/publik_regis/akun_regis.dart';

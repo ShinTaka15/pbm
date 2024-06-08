@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jember_wisataku/View/publik_guest/akun_guest.dart';
-import 'package:jember_wisataku/View/publik_guest/nav_guest.dart';
+import 'package:jember_wisataku/View/publik_guest/nav_publik.dart';
+import 'package:jember_wisataku/View/publik_regis/nav_regis.dart';
 
 import 'package:jember_wisataku/widget/widget_support.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Akun_Admin extends StatefulWidget {
   const Akun_Admin({Key? key}) : super(key: key);
@@ -19,16 +21,28 @@ class _Akun_AdminState extends State<Akun_Admin> {
   @override
   void initState() {
     super.initState();
-    _nameController.text = 'Surahki'; // Ganti dengan nama pengguna sebenarnya
-    _emailController.text =
-        'surahki@example.com'; // Ganti dengan email pengguna sebenarnya
+     _fetchUserData();
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    super.dispose();
+  Future<void> _fetchUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString('name');
+    String? email = prefs.getString('email');
+    setState(() {
+      _nameController.text = name ?? '';
+      _emailController.text = email ?? '';
+    });
+  }
+
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => nav_publik(),
+      ),
+    );
   }
 
   void _toggleEdit() {
@@ -106,14 +120,7 @@ class _Akun_AdminState extends State<Akun_Admin> {
                 ),
                 SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => nav_guest(),
-                      ),
-                    );
-                  },
+                  onPressed: _logout,
                   style: ButtonStyle(
                     backgroundColor:
                         MaterialStateProperty.all<Color>(Color(0xFFB4211C)),

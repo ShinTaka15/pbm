@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:jember_wisataku/View/publik_guest/akun_guest.dart';
-import 'package:jember_wisataku/View/publik_guest/nav_guest.dart';
-
+import 'package:jember_wisataku/View/publik_guest/nav_publik.dart';
 import 'package:jember_wisataku/widget/widget_support.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class akun_regis extends StatefulWidget {
   const akun_regis({Key? key}) : super(key: key);
@@ -15,26 +18,67 @@ class _akun_regisState extends State<akun_regis> {
   bool _isEditing = false;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  String? _userId;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = 'Surahki'; // Ganti dengan nama pengguna sebenarnya
-    _emailController.text =
-        'surahki@example.com'; // Ganti dengan email pengguna sebenarnya
+    _fetchUserData();
   }
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    super.dispose();
+  Future<void> _fetchUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString('name');
+    String? email = prefs.getString('email');
+    String? userId = prefs.getString('user_id');
+    setState(() {
+      _nameController.text = name ?? '';
+      _emailController.text = email ?? '';
+      _userId = userId; 
+    });
   }
 
   void _toggleEdit() {
     setState(() {
+      if (_isEditing) {
+        _saveName();
+      }
       _isEditing = !_isEditing;
     });
+  }
+
+  Future<void> _saveName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', _nameController.text);
+
+    final response = await http.put(
+      Uri.parse('https://127.0.0.1:8000/api/auth/update'), 
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer ${prefs.getString('access_token')}', 
+      },
+      body: jsonEncode(<String, String>{
+        // 'user_id': _userId ?? '',
+        'name': _nameController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Name updated successfully');
+    } else {
+      print('Failed to update name');
+    }
+  }
+
+  Future<void> _logout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => nav_publik(),
+      ),
+    );
   }
 
   @override
@@ -58,19 +102,6 @@ class _akun_regisState extends State<akun_regis> {
                       backgroundImage: NetworkImage(
                           'https://media.istockphoto.com/id/1131348804/id/vektor/ikon-pengisian-linier-wanita-bisnis-vector-gadis-bisnis-avatar-gambar-profil-gambar-garis.jpg?s=170667a&w=0&k=20&c=ixi0KyyovtLthGlo4MCephen0iZZLnF0pj8twL7qEmE='),
                     ),
-                    // Uncomment this if you want to use the edit icon on the avatar
-                    // Positioned(
-                    //   bottom: 0,
-                    //   right: 0,
-                    //   child: CircleAvatar(
-                    //     backgroundColor: Colors.white,
-                    //     radius: 20,
-                    //     child: IconButton(
-                    //       icon: Icon(Icons.edit, color: Color(0xFF44DB3C)),
-                    //       onPressed: _toggleEdit,
-                    //     ),
-                    //   ),
-                    // ),
                   ],
                 ),
                 SizedBox(height: 20),
@@ -83,7 +114,7 @@ class _akun_regisState extends State<akun_regis> {
                 _buildTextField(
                   controller: _emailController,
                   icon: Icons.email,
-                  isEditing: _isEditing,
+                  isEditing: false,
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -106,14 +137,7 @@ class _akun_regisState extends State<akun_regis> {
                 ),
                 SizedBox(height: 10),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => nav_guest(),
-                      ),
-                    );
-                  },
+                  onPressed: _logout,
                   style: ButtonStyle(
                     backgroundColor:
                         MaterialStateProperty.all<Color>(Color(0xFFB4211C)),

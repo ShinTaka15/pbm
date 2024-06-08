@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:jember_wisataku/View/publik_guest/nav_guest.dart';
+import 'package:jember_wisataku/View/publik_guest/nav_publik.dart';
+import 'package:jember_wisataku/View/publik_regis/nav_regis.dart';
 import 'package:jember_wisataku/widget/widget_support.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
@@ -18,7 +19,7 @@ class _SplashState extends State<Splash> {
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => nav_guest()),
+        MaterialPageRoute(builder: (context) => nav_publik()),
       );
     });
   }

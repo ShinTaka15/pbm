@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:jember_wisataku/Percobaan/maps.dart';
-import 'package:jember_wisataku/View/admin/kelola_wisata/read_wisata.dart';
-import 'package:jember_wisataku/View/admin/nav_admin.dart';
-import 'package:jember_wisataku/View/publik_guest/nav_guest.dart';
-import 'package:jember_wisataku/View/publik_regis/nav_regis.dart';
+import 'package:jember_wisataku/View/publik_guest/akun_guest.dart';
+import 'package:jember_wisataku/View/publik_guest/nav_publik.dart';
+import 'package:jember_wisataku/View/publik_guest/splash.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,7 +20,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // home: Splash(),
-      home: nav_guest(),
+      home: Splash(),
     );
   }
 }
